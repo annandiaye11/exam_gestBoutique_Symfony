@@ -1,0 +1,127 @@
+import React from 'react';
+
+const ClientForm = () => {
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Créer un nouveau client</h2>
+      
+      <form id="form_client" className="bg-white rounded-lg shadow-lg p-8 space-y-6" method="post" action="{{ path('client_new') }}">
+        {{ form_start(form) }}
+        
+        {/* Personal Information Section */}
+        <div className="space-y-4">
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {{ form_label(form.surname) }}
+            </label>
+            <div className="mt-1">
+              {{ form_widget(form.surname, {'attr': {'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'}}) }}
+            </div>
+            <div className="text-red-500 text-xs mt-1">
+              {{ form_errors(form.surname) }}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {{ form_label(form.telephone) }}
+            </label>
+            <div className="mt-1">
+              {{ form_widget(form.telephone, {'attr': {'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'}}) }}
+            </div>
+            <div className="text-red-500 text-xs mt-1">
+              {{ form_errors(form.telephone) }}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {{ form_label(form.adresse) }}
+            </label>
+            <div className="mt-1">
+              {{ form_widget(form.adresse, {'attr': {'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'}}) }}
+            </div>
+            <div className="text-red-500 text-xs mt-1">
+              {{ form_errors(form.adresse) }}
+            </div>
+          </div>
+        </div>
+
+        {/* Account Section */}
+        <div className="form-group pt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {{ form_label(form.addAccount) }}
+          </label>
+          <div className="mt-1">
+            {{ form_widget(form.addAccount, {'attr': {'class': 'rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+          </div>
+        </div>
+
+        <div id="form_user" className="space-y-4 pt-4">
+          {% if form.account is defined %}
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {{ form_label(form.account.nom) }}
+              </label>
+              <div className="mt-1">
+                {{ form_widget(form.account.nom, {'attr': {'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'}}) }}
+              </div>
+              {% if error_user is defined and error_user.nom is not null %}
+                <div className="text-red-500 text-xs mt-1">{{ error_user.nom }}</div>
+              {% endif %}
+            </div>
+
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {{ form_label(form.account.prenom) }}
+              </label>
+              <div className="mt-1">
+                {{ form_widget(form.account.prenom, {'attr': {'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'}}) }}
+              </div>
+              {% if error_user is defined and error_user.prenom is not null %}
+                <div className="text-red-500 text-xs mt-1">{{ error_user.prenom }}</div>
+              {% endif %}
+            </div>
+
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {{ form_label(form.account.login) }}
+              </label>
+              <div className="mt-1">
+                {{ form_widget(form.account.login, {'attr': {'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'}}) }}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {{ form_label(form.account.password) }}
+              </label>
+              <div className="mt-1">
+                {{ form_widget(form.account.password, {'attr': {'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'}}) }}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {{ form_label(form.account.isActive) }}
+              </label>
+              <div className="mt-1">
+                {{ form_widget(form.account.isActive, {'attr': {'class': 'rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <div className="pt-6">
+          <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+            Créer le client
+          </button>
+        </div>
+
+        {{ form_end(form) }}
+      </form>
+    </div>
+  );
+};
+
+export default ClientForm;

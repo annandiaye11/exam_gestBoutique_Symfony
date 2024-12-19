@@ -1,0 +1,204 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ClientController!{% endblock %}
+
+{% block body %}
+{% set restant = 0 %}
+
+<!-- Modern Header -->
+<div class="min-h-screen bg-gray-50">
+    <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white py-6 px-8 shadow-lg">
+        <h1 class="text-3xl font-bold">Gestion des Clients</h1>
+    </header>
+
+    <div class="flex min-h-[calc(100vh-144px)]">
+        <!-- Sidebar -->
+        <twig:Navigation />
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8">
+            <div class="max-w-7xl mx-auto">
+                <!-- Client Info Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Informations Client</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="space-y-2">
+                            <p class="text-sm font-medium text-gray-500">Surname</p>
+                            <p class="text-lg text-gray-900">{{client.surname}}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-sm font-medium text-gray-500">Téléphone</p>
+                            <p class="text-lg text-gray-900">{{client.telephone}}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-sm font-medium text-gray-500">Adresse</p>
+                            <p class="text-lg text-gray-900">{{client.adresse}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="mb-8">
+                    {{form_start(form, {'attr': {'class': 'flex gap-4'}}, { method: "GET" })}}
+                    {{ form_widget(form.status, {'attr': {'class': 'rounded-lg border-gray-200 px-4 py-2 focus:ring-blue-500 focus:border-blue-500'}}) }}
+                    {{ form_end(form) }}
+                </div>
+
+                <!-- Dettes Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant Versé</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Détails</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payement</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            {% for dette in dettes %}
+                                {% set restant = restant + (dette.montant - dette.montantVerser) %}
+                                <tr class="dette-row hover:bg-gray-50" data-dette-id="{{ dette.id }}">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dette.id}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dette.data ? dette.data|date('Y-m-d') : 'N/A'}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dette.montant}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dette.montantVerser}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-3 py-1 rounded-full text-sm font-medium {% if dette.montant == dette.montantVerser %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                            {{dette.montant == dette.montantVerser ? "Payé" : "Impayé"}}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <button class="toggle-details inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                            Voir détails
+                                        </button>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% if dette.status != constant('App\\Enum\\StatusDette::Paye') %}
+                                            <form action="{{ path('app_detteClient_payment', {'id': dette.id}) }}" method="post" class="flex items-center gap-2">
+                                                <input type="number" name="payement[montant]" required min="1" max="{{ dette.montant - dette.montantVerser }}" 
+                                                    class="w-24 rounded-lg border-gray-200 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                                <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                                                    Payer
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-green-600 font-medium">Payé</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr class="dette-details hidden" data-dette-id="{{ dette.id }}">
+                                    <td colspan="7" class="px-6 py-4 bg-gray-50">
+                                        <div class="grid grid-cols-2 gap-8">
+                                            <!-- Articles -->
+                                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                <h3 class="font-bold text-lg text-gray-900 mb-4">Articles</h3>
+                                                <table class="min-w-full divide-y divide-gray-200">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Quantité</th>
+                                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Prix</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="divide-y divide-gray-200">
+                                                        {% for detailArticle in dette.detailArticleDettes %}
+                                                            <tr>
+                                                                <td class="px-4 py-2 text-sm text-gray-900">{{ detailArticle.article.libelle }}</td>
+                                                                <td class="px-4 py-2 text-sm text-gray-900">{{ detailArticle.qte }}</td>
+                                                                <td class="px-4 py-2 text-sm text-gray-900">{{ detailArticle.total }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- Paiements -->
+                                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                <h3 class="font-bold text-lg text-gray-900 mb-4">Paiements</h3>
+                                                <table class="min-w-full divide-y divide-gray-200">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="divide-y divide-gray-200">
+                                                        {% for payement in dette.payements %}
+                                                            <tr>
+                                                                <td class="px-4 py-2 text-sm text-gray-900">{{ payement.montant }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-8 flex justify-center">
+                    <nav class="flex items-center space-x-2">
+                        {% if page > 1 %}
+                            <a href="?page={{page - 1}}&statuts={{statuts}}" 
+                               class="inline-flex items-center px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                &lt;&lt;
+                            </a>
+                        {% endif %}
+
+                        {% for i in 1..maxPage %}
+                            <a href="?page={{i}}&statuts={{statuts}}" 
+                               class="inline-flex items-center px-4 py-2 rounded-lg border {% if page == i %}border-blue-500 bg-blue-50 text-blue-600{% else %}border-gray-300 bg-white text-gray-700 hover:bg-gray-50{% endif %} text-sm font-medium">
+                                {{ i }}
+                            </a>
+                        {% endfor %}
+
+                        {% if page < maxPage %}
+                            <a href="?page={{page + 1}}&statuts={{statuts}}" 
+                               class="inline-flex items-center px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                &gt;&gt;
+                            </a>
+                        {% endif %}
+                    </nav>
+                </div>
+
+                <!-- Total Amount -->
+                <div class="mt-8 flex justify-end">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 px-6 py-4">
+                        <p class="text-xl font-semibold text-gray-900">
+                            Total restant à payer : 
+                            <span class="text-red-600">{{restant}} Fcfa</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-blue-800 to-blue-600 text-white py-4 px-8 text-center">
+        <p class="text-sm">&copy; 2023 Gestion des Clients. Tous droits réservés.</p>
+    </footer>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.toggle-details');
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const detteId = this.closest('tr').dataset.detteId;
+            const detailsRow = document.querySelector(`.dette-details[data-dette-id="${detteId}"]`);
+            detailsRow.classList.toggle('hidden');
+            this.textContent = detailsRow.classList.contains('hidden') ? 'Voir détails' : 'Cacher détails';
+        });
+    });
+});
+</script>
+{% endblock %}

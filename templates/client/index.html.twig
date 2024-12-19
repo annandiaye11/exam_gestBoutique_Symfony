@@ -1,0 +1,175 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ClientController!{% endblock %}
+
+{% block body %}
+    <div class="min-h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white py-6 px-8 shadow-lg">
+            <h1 class="text-3xl font-bold">Gestion des Clients</h1>
+        </header>
+
+        <div class="flex min-h-[calc(100vh-144px)]">
+            <!-- Sidebar -->
+            <twig:Navigation />
+
+            <!-- Main Content -->
+            <main class="flex-1 p-8">
+                <div class="flex gap-8">
+                    <!-- Client Creation Form -->
+                    <div class="w-1/2">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Créer un nouveau client</h2>
+                        <form id="form_client" class="bg-white rounded-xl shadow-sm border border-gray-100 p-8" method="post" action="{{ path('client_new') }}">
+                            {{ form_start(form) }}
+
+                            <div class="space-y-6">
+                                <div class="space-y-2">
+                                    {{ form_label(form.surname, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                    {{ form_widget(form.surname, {'attr': {'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                                    <div class="text-red-500 text-xs">{{ form_errors(form.surname) }}</div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    {{ form_label(form.telephone, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                    {{ form_widget(form.telephone, {'attr': {'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                                    <div class="text-red-500 text-xs">{{ form_errors(form.telephone) }}</div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    {{ form_label(form.adresse, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                    {{ form_widget(form.adresse, {'attr': {'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                                    <div class="text-red-500 text-xs">{{ form_errors(form.adresse) }}</div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    {{ form_label(form.addAccount, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                    {{ form_widget(form.addAccount, {'attr': {'class': 'mt-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                                </div>
+
+                                <div id="form_user" class="space-y-6">
+                                    {% if form.account is defined %}
+                                        <div class="space-y-2">
+                                            {{ form_label(form.account.nom, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                            {{ form_widget(form.account.nom, {'attr': {'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                                            {% if error_user is defined and error_user.nom is not null %}
+                                                <div class="text-red-500 text-xs">{{ error_user.nom }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            {{ form_label(form.account.prenom, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                            {{ form_widget(form.account.prenom, {'attr': {'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                                            {% if error_user is defined and error_user.prenom is not null %}
+                                                <div class="text-red-500 text-xs">{{ error_user.prenom }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            {{ form_label(form.account.login, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                            {{ form_widget(form.account.login, {'attr': {'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            {{ form_label(form.account.password, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                            {{ form_widget(form.account.password, {'attr': {'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="pt-4">
+                                    <button class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200" type="submit">
+                                        Créer le client
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{ form_end(form) }}
+                        </form>
+                    </div>
+
+                    <!-- Client List -->
+                    <div class="w-1/2">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Liste des clients</h2>
+                        
+                        <!-- Search Form -->
+                        <div class="mb-6">
+                            {{form_start(formSearch, {'attr': {'class': 'flex gap-4'}})}}
+                            {{ form_widget(formSearch.telephone, {'attr': {'class': 'flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                            {{ form_widget(formSearch.surname, {'attr': {'class': 'flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                            {{ form_widget(formSearch.Search, {'attr': {'class': 'px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200'}}) }}
+                            {{ form_end(formSearch) }}
+                        </div>
+
+                        <!-- Clients List -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                            <ul class="divide-y divide-gray-200">
+                                {% for client in clients %}
+                                    <li class="p-6 hover:bg-gray-50 transition-colors duration-200">
+                                        <div class="flex justify-between">
+                                            <div class="space-y-2">
+                                                <div class="font-semibold text-lg text-gray-900">{{ client.surname }}</div>
+                                                <div class="text-sm text-gray-600">Téléphone: {{ client.telephone }}</div>
+                                                <div class="text-sm text-gray-600">Adresse: {{ client.adresse }}</div>
+                                                {% if client.account %}
+                                                    <div class="text-sm text-gray-600">Login: {{ client.account.login }}</div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex gap-4">
+                                                <a href="{{ path('dettesbyClient', {'idClient': client.id}) }}" 
+                                                   class="text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/>
+                                                    </svg>
+                                                </a>
+                                                <button class="text-red-600 hover:text-red-800 transition-colors duration-200">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% else %}
+                                    <li class="p-6 text-gray-500">Aucun client trouvé.</li>
+                                {% endfor %}
+                            </ul>
+
+                            <!-- Pagination -->
+                            <div class="p-4 border-t border-gray-200">
+                                <nav class="flex justify-center">
+                                    <div class="flex gap-2">
+                                        {% if page > 1 %}
+                                            <a href="{{ path('app_client', { page: page - 1 }) }}" 
+                                               class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                                &lt;&lt;
+                                            </a>
+                                        {% endif %}
+
+                                        {% for i in 1..maxPage %}
+                                            <a href="{{ path('app_client', { page: i }) }}" 
+                                               class="px-4 py-2 rounded-lg border {% if page == i %}border-blue-500 bg-blue-50 text-blue-600{% else %}border-gray-300 bg-white text-gray-700 hover:bg-gray-50{% endif %} text-sm font-medium">
+                                                {{ i }}
+                                            </a>
+                                        {% endfor %}
+
+                                        {% if page < maxPage %}
+                                            <a href="{{ path('app_client', { page: page + 1 }) }}" 
+                                               class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                                &gt;&gt;
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-gradient-to-r from-blue-800 to-blue-600 text-white py-4 px-8 text-center">
+            <p class="text-sm">&copy; 2023 Gestion des Clients. Tous droits réservés.</p>
+        </footer>
+    </div>
+{% endblock %}

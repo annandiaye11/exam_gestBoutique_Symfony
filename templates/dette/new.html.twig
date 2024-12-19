@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une nouvelle dette{% endblock %}
+
+{% block body %}
+    <!-- Header -->
+    <header class="bg-[#1E375A] text-white py-6">
+        <div class="max-w-7xl mx-auto px-6">
+            <h1 class="text-3xl font-bold">Créer une nouvelle dette</h1>
+        </div>
+    </header>
+
+    <div class="flex flex-1 min-h-[850px]">
+        <!-- Sidebar -->
+        <twig:Navigation />
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 bg-gray-50">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    {{ form_start(form, {'attr': {'class': 'p-8 space-y-6'}}) }}
+                        <!-- Date -->
+                        <div class="space-y-2">
+                            {{ form_label(form.data, null, {'label_attr': {
+                                'class': 'block text-sm font-medium text-gray-700'
+                            }}) }}
+                            {{ form_widget(form.data, {'attr': {
+                                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
+                            }}) }}
+                            {{ form_errors(form.data, {'attr': {'class': 'text-red-500 text-xs mt-1'}}) }}
+                        </div>
+
+                        <!-- Client -->
+                        <div class="space-y-2">
+                            {{ form_label(form.client, null, {'label_attr': {
+                                'class': 'block text-sm font-medium text-gray-700'
+                            }}) }}
+                            {{ form_widget(form.client, {'attr': {
+                                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
+                            }}) }}
+                            {{ form_errors(form.client, {'attr': {'class': 'text-red-500 text-xs mt-1'}}) }}
+                        </div>
+
+                        <!-- Articles -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-medium text-gray-900">Articles</h3>
+                            <div id="detail-article-dette-list"
+                                 data-prototype="{{ form_widget(form.detailArticleDettes.vars.prototype)|e('html_attr') }}"
+                                 data-widget-tags="{{ '<div class="space-y-4"></div>'|e }}"
+                                 data-widget-counter="{{ form.detailArticleDettes|length }}"
+                                 class="space-y-4">
+                                {% for detailArticleDetteForm in form.detailArticleDettes %}
+                                    <div class="p-4 border border-gray-200 rounded-md bg-gray-50">
+                                        {{ form_widget(detailArticleDetteForm) }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" 
+                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
+                                    id="add-another-article">
+                                Ajouter un article
+                            </button>
+                        </div>
+
+                        <!-- Montant Versé -->
+                        <div class="space-y-2">
+                            {{ form_label(form.montantVerser, null, {'label_attr': {
+                                'class': 'block text-sm font-medium text-gray-700'
+                            }}) }}
+                            {{ form_widget(form.montantVerser, {'attr': {
+                                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
+                            }}) }}
+                            {{ form_errors(form.montantVerser, {'attr': {'class': 'text-red-500 text-xs mt-1'}}) }}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="pt-4">
+                            <button class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
+                                    type="submit">
+                                Créer la dette
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#1E375A] text-white py-6">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-sm">&copy; 2023 Gestion des Dettes. Tous droits réservés.</p>
+        </div>
+    </footer>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const detailList = document.querySelector('#detail-article-dette-list');
+    const addButton = document.querySelector('#add-another-article');
+
+    addButton.addEventListener('click', function() {
+        const prototype = detailList.dataset.prototype;
+        const index = detailList.dataset.widgetCounter;
+        const newForm = prototype.replace(/__name__/g, index);
+        detailList.dataset.widgetCounter = parseInt(index) + 1;
+
+        const newElement = document.createElement('div');
+        newElement.innerHTML = newForm;
+        newElement.classList.add('p-4', 'border', 'border-gray-200', 'rounded-md', 'bg-gray-50', 'mb-4');
+        detailList.appendChild(newElement);
+    });
+});
+</script>
+{% endblock %}
